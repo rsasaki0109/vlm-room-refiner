@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0a0a"/>
+      <stop offset="1" stop-color="#1f2937"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+    <style>
+      .title { font: 800 64px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif; letter-spacing: -0.02em; }
+      .subtitle { font: 500 26px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif; opacity: 0.9; }
+      .pill { font: 700 20px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif; }
+      .mono { font: 600 18px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Noto Sans Mono", monospace; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Accent bar -->
+  <rect x="0" y="0" width="1200" height="10" fill="url(#accent)"/>
+
+  <!-- Left content -->
+  <g transform="translate(84 110)">
+    <text class="title" x="0" y="0" fill="#ffffff">vlm-room-refiner</text>
+    <text class="subtitle" x="0" y="52" fill="#e5e7eb">èK™ ’ íü«ëVLM ’ 9„ÐHJSON</text>
+
+    <!-- Pills -->
+    <g transform="translate(0 94)">
+      <rect x="0" y="0" rx="999" ry="999" width="178" height="44" fill="#111827" stroke="#334155"/>
+      <text class="pill" x="18" y="29" fill="#a7f3d0">Ollama</text>
+
+      <rect x="196" y="0" rx="999" ry="999" width="226" height="44" fill="#111827" stroke="#334155"/>
+      <text class="pill" x="214" y="29" fill="#bae6fd">Qwen2.5VL</text>
+
+      <rect x="440" y="0" rx="999" ry="999" width="170" height="44" fill="#111827" stroke="#334155"/>
+      <text class="pill" x="458" y="29" fill="#e9d5ff">FastAPI</text>
+
+      <rect x="628" y="0" rx="999" ry="999" width="178" height="44" fill="#111827" stroke="#334155"/>
+      <text class="pill" x="646" y="29" fill="#fde68a">Next.js</text>
+    </g>
+
+    <!-- Value props -->
+    <g transform="translate(0 178)">
+      <circle cx="10" cy="10" r="6" fill="#22c55e"/>
+      <text class="subtitle" x="28" y="18" fill="#e5e7eb">ULÜWDK’iFôYK’U’·FK</text>
+
+      <circle cx="10" cy="54" r="6" fill="#38bdf8"/>
+      <text class="subtitle" x="28" y="62" fill="#e5e7eb">Web / CLI / API gÕO MVP</text>
+    </g>
+  </g>
+
+  <!-- Right code card -->
+  <g transform="translate(650 150)" filter="url(#shadow)">
+    <rect x="0" y="0" width="470" height="350" rx="18" ry="18" fill="#0b1220" stroke="#1f2937"/>
+    <rect x="0" y="0" width="470" height="46" rx="18" ry="18" fill="#0f172a"/>
+    <circle cx="22" cy="23" r="6" fill="#ef4444"/>
+    <circle cx="42" cy="23" r="6" fill="#f59e0b"/>
+    <circle cx="62" cy="23" r="6" fill="#22c55e"/>
+    <text class="mono" x="88" y="29" fill="#93c5fd">response.json</text>
+
+    <g class="mono" fill="#e5e7eb" transform="translate(26 78)">
+      <text x="0" y="0">{"room_type":"ïóëüà",</text>
+      <text x="0" y="28"> "style":"!pûßËÞë",</text>
+      <text x="0" y="56"> "problems":[</text>
+      <text x="0" y="84">  "MÚL‹H‹",</text>
+      <text x="0" y="112">  "ÎL³"</text>
+      <text x="0" y="140"> ],</text>
+      <text x="0" y="168"> "recommendations":[</text>
+      <text x="0" y="196">  "MÚâüëgtÚ",</text>
+      <text x="0" y="224">  "Á›kÎéÃ¯"</text>
+      <text x="0" y="252"> ],</text>
+      <text x="0" y="280"> "shopping_keywords":[</text>
+      <text x="0" y="308">  "MÚâüë }",</text>
+      <text x="0" y="336">  "¹ÁüëéÃ¯ 60cm"</text>
+      <text x="0" y="364"> ]}</text>
+    </g>
+  </g>
+</svg>
