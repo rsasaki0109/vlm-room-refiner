@@ -6,10 +6,31 @@ const apiBase =
   process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8010";
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "1";
 
 type Result = Record<string, unknown>;
 
 type ApiError = { status: number; title: string; message: string };
+
+const demoResponse: Result = {
+  room_type: "ワンルーム",
+  style: "無印系ミニマル",
+  problems: [
+    "配線が床沿いに見えて生活感が出やすい",
+    "収納が足りず、床に物が溜まりやすい",
+    "照明が単一で陰影が弱い",
+  ],
+  recommendations: [
+    "配線モールで壁沿いにまとめ、床の露出配線を減らす",
+    "縦長ラック（幅60cm前後）を壁際に置き、床置き物を集約",
+    "間接照明を1灯追加し、色温度を暖色寄りに統一",
+  ],
+  shopping_keywords: [
+    "配線モール 白 粘着",
+    "スチールラック 幅60 奥行30",
+    "フロアライト 間接照明 調光 暖色",
+  ],
+};
 
 function prettyJson(v: Result) {
   return JSON.stringify(v, null, 2);
@@ -102,6 +123,12 @@ export default function Home() {
     setLoading(true);
     setError(null);
     setData(null);
+    if (DEMO_MODE) {
+      await new Promise((r) => setTimeout(r, 450));
+      setData(demoResponse);
+      setLoading(false);
+      return;
+    }
     const form = new FormData();
     form.append("file", file);
     if (style.trim()) {
@@ -137,11 +164,25 @@ export default function Home() {
     <div className="min-h-screen bg-zinc-100 text-zinc-900 p-6 md:p-10">
       <div className="max-w-3xl mx-auto space-y-8">
         <header>
-          <h1 className="text-2xl font-semibold tracking-tight">vlm-room-refiner</h1>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">vlm-room-refiner</h1>
+              <p className="text-sm text-zinc-600 mt-1">
+                部屋の画像をアップロードすると、Ollama 上の Qwen2.5-VL
+                による分析結果（JSON）を返します。短辺が極端に小さいと失敗しやすいため、
+                ある程度の解像度（目安: 各辺 32 ピクセル以上）を推奨します。
+              </p>
+            </div>
+            {DEMO_MODE && (
+              <span className="shrink-0 inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-700">
+                Demo（モック応答）
+              </span>
+            )}
+          </div>
           <p className="text-sm text-zinc-600 mt-1">
-            部屋の画像をアップロードすると、Ollama 上の Qwen2.5-VL
-            による分析結果（JSON）を返します。短辺が極端に小さいと失敗しやすいため、
-            ある程度の解像度（目安: 各辺 32 ピクセル以上）を推奨します。
+            {DEMO_MODE
+              ? "GitHub Pages では API を使わず、画面の動きが分かるようにサンプルJSONを返します。"
+              : `API: ${apiBase}`}
           </p>
         </header>
 
