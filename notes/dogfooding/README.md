@@ -1,0 +1,42 @@
+# dogfooding notes
+
+## 目的
+
+いろんな **ユーザー像（ペルソナ）** を参考に、同じ部屋画像でも `style/budget/before_after` を変えて VLM 出力がどう変化するかを記録する。
+
+## 重要（コミットしない）
+
+- 実部屋写真は個人情報・プライバシーになりうるため **コミットしない**。  
+  画像は `/media/sasaki/aiueo/ai_coding_ws/vlm-room-refiner/dogfood-input/` に置き、`.gitignore` 済み。
+
+## 使い方
+
+1. ペルソナ定義（JSON）を確認/編集:
+   - `/media/sasaki/aiueo/ai_coding_ws/vlm-room-refiner/dogfooding/personas.json`
+2. 入力画像を置く（コミット禁止）:
+   - `/media/sasaki/aiueo/ai_coding_ws/vlm-room-refiner/dogfood-input/`
+3. バッチ実行（Ollama 起動済み、`OLLAMA_MODEL` 任意）:
+
+```bash
+cd /media/sasaki/aiueo/ai_coding_ws/vlm-room-refiner/backend
+source .venv/bin/activate
+python dogfood.py --images dogfood-input --personas dogfooding/personas.json --out notes/dogfooding
+```
+
+出力: `notes/dogfooding/*.md`（1画像×1ペルソナ=1ファイル）。
+
+## 推奨ワークフロー
+
+- まず `dogfood-input/` に **PNG/JPEG/WebP** を置く（SVG はモデルが失敗しやすいので避ける）
+- `python dogfood.py ...` を実行
+- 生成された `.md` の「結論」を埋め、`prompt.py` 変更→再実行で差分比較
+
+## 記録フォーマット
+
+各レポートは以下を含む:
+
+- 結論
+- 確認済み事実
+- 未確認/要確認項目
+- 次アクション
+

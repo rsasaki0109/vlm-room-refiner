@@ -1,0 +1,45 @@
+{
+  "personas": [
+    {
+      "key": "student_minimal",
+      "name": "一人暮らし学生（省スペース・ミニマル）",
+      "style": "ミニマル",
+      "budget": "〜1万円",
+      "before_after": true,
+      "note": "散らかりやすい前提。収納と配線を最優先。"
+    },
+    {
+      "key": "korean_photo",
+      "name": "韓国風に寄せたい（写真映え）",
+      "style": "韓国風",
+      "budget": "〜2万円",
+      "before_after": true,
+      "note": "淡色×曲線×点の光。色温度と素材感に触れてほしい。"
+    },
+    {
+      "key": "mote_hotel",
+      "name": "モテ部屋（ホテルライク）",
+      "style": "ホテルライク / モテ部屋",
+      "budget": "〜3万円",
+      "before_after": true,
+      "note": "間接照明・余白・統一感。ベッド周りの見え方。"
+    },
+    {
+      "key": "family_safe",
+      "name": "同棲・ファミリー（安全/動線）",
+      "style": "ナチュラル",
+      "budget": "〜3万円",
+      "before_after": false,
+      "note": "角/配線/転倒など安全性と動線を重視。"
+    },
+    {
+      "key": "wfh_productive",
+      "name": "在宅ワーク（集中・オンライン会議映え）",
+      "style": "北欧 / ミニマル",
+      "budget": "〜2万円",
+      "before_after": true,
+      "note": "背景（壁/棚/照明）とデスク周りを優先。"
+    }
+  ]
+}
+

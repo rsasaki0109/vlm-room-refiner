@@ -17,6 +17,9 @@ next-env.d.ts
 test-results/
 playwright-report/
 
+# dogfooding inputs (do not commit personal room photos)
+dogfood-input/
+
 # env
 .env
 .env.local
