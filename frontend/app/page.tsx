@@ -12,24 +12,72 @@ type Result = Record<string, unknown>;
 
 type ApiError = { status: number; title: string; message: string };
 
-const demoResponse: Result = {
-  room_type: "ワンルーム",
-  style: "無印系ミニマル",
-  problems: [
-    "配線が床沿いに見えて生活感が出やすい",
-    "収納が足りず、床に物が溜まりやすい",
-    "照明が単一で陰影が弱い",
-  ],
-  recommendations: [
-    "配線モールで壁沿いにまとめ、床の露出配線を減らす",
-    "縦長ラック（幅60cm前後）を壁際に置き、床置き物を集約",
-    "間接照明を1灯追加し、色温度を暖色寄りに統一",
-  ],
-  shopping_keywords: [
-    "配線モール 白 粘着",
-    "スチールラック 幅60 奥行30",
-    "フロアライト 間接照明 調光 暖色",
-  ],
+type PresetKey = "minimal" | "korean" | "mote";
+
+const presetLabel: Record<PresetKey, string> = {
+  minimal: "ミニマル",
+  korean: "韓国風",
+  mote: "モテ部屋",
+};
+
+const presetDemo: Record<PresetKey, Result> = {
+  minimal: {
+    room_type: "ワンルーム",
+    style: "無印系ミニマル",
+    problems: [
+      "配線が床沿いに見えて生活感が出やすい",
+      "収納が足りず、床に物が溜まりやすい",
+      "照明が単一で陰影が弱い",
+    ],
+    recommendations: [
+      "配線モールで壁沿いにまとめ、床の露出配線を減らす",
+      "縦長ラック（幅60cm前後）を壁際に置き、床置き物を集約",
+      "間接照明を1灯追加し、色温度を暖色寄りに統一",
+    ],
+    shopping_keywords: [
+      "配線モール 白 粘着",
+      "スチールラック 幅60 奥行30",
+      "フロアライト 間接照明 調光 暖色",
+    ],
+  },
+  korean: {
+    room_type: "ワンルーム",
+    style: "韓国風（淡色×曲線）",
+    problems: [
+      "色が散って統一感が出にくい",
+      "直線的な家具で“柔らかさ”が不足",
+      "照明の演出が弱く写真映えしにくい",
+    ],
+    recommendations: [
+      "ベージュ〜アイボリーでベース色を2色に絞る（小物も同系統へ）",
+      "円形ラグやラウンドミラーで曲線要素を追加する",
+      "シェード付きテーブルライトで“点”の光を作る（暖色）",
+    ],
+    shopping_keywords: [
+      "円形ラグ アイボリー 160cm",
+      "ラウンドミラー 直径50",
+      "テーブルライト シェード 暖色",
+    ],
+  },
+  mote: {
+    room_type: "ワンルーム",
+    style: "モテ部屋（ホテルライク×間接照明）",
+    problems: [
+      "照明が天井1灯のみで立体感が出ない",
+      "ベッド周りに“余白”がなく雑然と見える",
+      "素材感（木/布/金属）のバランスが弱い",
+    ],
+    recommendations: [
+      "フロアライト＋テーブルライトの2灯で陰影を作る（暖色）",
+      "ベッドサイドを“何も置かない面”を1つ作って余白を確保",
+      "木目（オーク）×黒のアクセントを2点だけ入れて締める",
+    ],
+    shopping_keywords: [
+      "フロアライト 間接照明 調光",
+      "サイドテーブル 木目 オーク",
+      "クッションカバー ブラック 45cm",
+    ],
+  },
 };
 
 function prettyJson(v: Result) {
@@ -84,6 +132,7 @@ function parseApiError(
 }
 
 function DemoForm() {
+  const [preset, setPreset] = useState<PresetKey>("minimal");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [style, setStyle] = useState("");
@@ -125,7 +174,7 @@ function DemoForm() {
     setData(null);
     if (DEMO_MODE) {
       await new Promise((r) => setTimeout(r, 450));
-      setData(demoResponse);
+      setData(presetDemo[preset]);
       setLoading(false);
       return;
     }
@@ -176,6 +225,32 @@ function DemoForm() {
             Demo（モック応答）
           </span>
         )}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {(Object.keys(presetLabel) as PresetKey[]).map((k) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => {
+              setPreset(k);
+              if (!style.trim()) {
+                setStyle(presetLabel[k]);
+              }
+            }}
+            className={[
+              "rounded-full px-3 py-1 text-xs font-medium border transition",
+              preset === k
+                ? "bg-zinc-900 text-white border-zinc-900"
+                : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50",
+            ].join(" ")}
+          >
+            {presetLabel[k]}
+          </button>
+        ))}
+        <span className="text-xs text-zinc-500 self-center">
+          プリセットで“それっぽい提案”を出しやすく
+        </span>
       </div>
 
       <div>
@@ -384,6 +459,52 @@ export default function Home() {
 
           <section id="demo" className="scroll-mt-16 space-y-4">
             <DemoForm />
+          </section>
+
+          <section className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+              <h2 className="text-lg font-semibold">Before → After（テキスト提案）</h2>
+              <p className="mt-2 text-sm text-zinc-600">
+                “写真を見て何を変えると映えるか”を、実行順に言語化。大掛かりなリフォームではなく、
+                まずは <span className="font-medium">照明・配線・余白</span> から。
+              </p>
+              <div className="mt-4 grid gap-3">
+                <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-4">
+                  <p className="text-xs font-semibold text-zinc-500">Before</p>
+                  <p className="mt-1 text-sm">
+                    天井照明1灯、露出配線、床置きが多くて視線が散る
+                  </p>
+                </div>
+                <div className="rounded-xl bg-zinc-900 text-white p-4">
+                  <p className="text-xs font-semibold text-zinc-300">After</p>
+                  <p className="mt-1 text-sm">
+                    2灯の暖色で陰影を作り、配線を壁沿いへ。床置きをラックに集約して余白を確保
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+              <h2 className="text-lg font-semibold">ユースケース（“使ってる感”）</h2>
+              <p className="mt-2 text-sm text-zinc-600">
+                目的が違うと正解も変わる。プリセットや予算を入れて、提案を寄せられます。
+              </p>
+              <div className="mt-4 grid gap-3">
+                {[
+                  ["ミニマル", "物量を減らすより“見える情報”を減らす"],
+                  ["韓国風", "淡色×曲線×点の光で写真映え"],
+                  ["モテ部屋", "ホテルライク＋間接照明で立体感"],
+                ].map(([t, d]) => (
+                  <div
+                    key={t}
+                    className="rounded-xl border border-zinc-200 p-4"
+                  >
+                    <p className="text-sm font-semibold">{t}</p>
+                    <p className="mt-1 text-sm text-zinc-600">{d}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </section>
 
           <footer className="pt-2 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between text-xs text-zinc-500">

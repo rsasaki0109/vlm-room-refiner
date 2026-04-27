@@ -43,6 +43,9 @@ test("capture real UI screenshot (mocked API)", async ({ page }) => {
   );
   await page.setInputFiles('input[type="file"]', sample);
 
+  // Select preset (optional)
+  await page.getByRole("button", { name: "韓国風" }).click();
+
   await page.getByPlaceholder("例: 韓国風 / ミニマル").fill("ミニマル");
   await page.getByPlaceholder("例: 1万円前後").fill("〜1万円");
   await page
