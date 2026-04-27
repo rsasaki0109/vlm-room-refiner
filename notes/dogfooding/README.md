@@ -45,6 +45,8 @@ python dogfood_index.py --dir notes/dogfooding
 
 ## 推奨ワークフロー
 
+- 実写が無い場合は合成PNGを生成できる: `python scripts/gen_dogfood_synthetic_images.py`（`dogfood-input/` に出力。要 Pillow）
+- フロントから同じフローを叩く: `cd frontend && npm run dogfood`（`backend/run-dogfood.sh` を実行）
 - まず `dogfood-input/` に **PNG/JPEG/WebP** を置く（SVG はモデルが失敗しやすいので避ける）
 - `python dogfood.py ...` を実行
 - 生成された `.md` の「結論」を埋め、`prompt.py` 変更→再実行で差分比較

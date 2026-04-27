@@ -50,12 +50,20 @@ def _has_error(md: str) -> bool:
 
 
 def _flags(md: str) -> str:
-    # 非現実/工事っぽいキーワードをざっくり検出（dogfoodingで早期に拾う用）
+    # 非現実/工事っぽいキーワードを検出。「設置」「天井」単独は誤検知が多いので除外し、工事・施工に寄せる。
     bad = []
     patterns = [
         (r"壁紙|塗装|張り替え|床材|フローリング", "reform"),
-        (r"天井|ダウンライト|配線工事|電気工事|増設|設置", "work"),
-        (r"窓を設置|壁を壊す", "forbidden"),
+        (
+            r"電気工事|配線工事|コンセント増設|埋め込み|ダウンライト"
+            r"|シーリング(?:照明)?(?:を)?(?:施工|工事)|天井(?:照明)?(?:を)?(?:施工|工事)",
+            "work",
+        ),
+        (
+            r"窓を設置|壁を壊す|開口部を増やす|開口を増やす|壁に穴を開ける"
+            r"|リフォーム(?:工事)?|増築",
+            "forbidden",
+        ),
     ]
     for pat, tag in patterns:
         if re.search(pat, md):
@@ -112,8 +120,9 @@ def main() -> None:
     for r in rows:
         status = "error" if r.has_error else "ok"
         concl = (r.conclusion or "").replace("|", "\\|")
+        flags_cell = r.flags if r.flags.strip() else "—"
         lines.append(
-            f"| `{r.file}` | `{r.persona_key}` | `{Path(r.image).name}` | `{r.model}` | `{r.ran_at}` | **{status}** | `{r.flags}` | {concl} |"
+            f"| `{r.file}` | `{r.persona_key}` | `{Path(r.image).name}` | `{r.model}` | `{r.ran_at}` | **{status}** | `{flags_cell}` | {concl} |"
         )
 
     lines += ["", "## 次アクション", "", "- `ok` のレポートから、誤字/抽象表現/非現実提案のパターンを拾って `backend/prompt.py` を1点ずつ改善。", ""]
