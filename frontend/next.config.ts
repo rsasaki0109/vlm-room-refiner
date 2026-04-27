@@ -7,7 +7,14 @@ const nextConfig: NextConfig = {
   // ルートにも package-lock がある場合のファイルトレース警告を抑える
   outputFileTracingRoot: path.join(__dirname, ".."),
   // Playwright 等で 127.0.0.1 から開くケースの警告回避
-  allowedDevOrigins: ["http://127.0.0.1", "http://localhost"],
+  allowedDevOrigins: [
+    "http://127.0.0.1",
+    "http://localhost",
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3001",
+    "http://localhost:3001",
+  ],
   // GitHub Pages 用（静的書き出し + basePath）
   ...(isPages
     ? {
