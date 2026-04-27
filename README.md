@@ -2,7 +2,35 @@
 
 [![CI](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml/badge.svg)](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml)
 
-部屋の写真を **Ollama 上の Qwen2.5-VL**（ローカル VLM）に渡し、**部屋タイプ・スタイル・課題・改善案・購入用キーワード**を JSON で返す Web＋API です。完璧な精度は狙わず、プロンプト改善で育てる前提の MVP です。
+部屋の写真を入れるだけで、**「何が惜しいか」→「どう直すか」→「何を買うか」**を **JSON** で返す、ローカル完結の部屋改善アプリ（MVP）。
+
+- **ローカルVLM**: Ollama + Qwen2.5-VL（画像は基本ローカルで処理）
+- **Web/CLI/API**: ブラウザでアップロード、CLIで一発、APIで連携
+- **実用優先**: 完璧な精度より「手が動く」提案を優先（プロンプトで育てる前提）
+
+---
+
+## 返すJSON（MVP）
+
+```json
+{
+  "room_type": "ワンルーム",
+  "style": "無印系ミニマル",
+  "problems": ["…"],
+  "recommendations": ["…"],
+  "shopping_keywords": ["…"]
+}
+```
+
+## デモ（curl）
+
+API を起動したあと（後述）、部屋画像を投げるだけ:
+
+```bash
+curl -sS -F "file=@/path/to/room.jpg" http://127.0.0.1:8010/analyze | jq .
+```
+
+（`jq` が無ければ `| jq .` を外してください）
 
 | 層 | 技術 |
 |----|------|
@@ -27,7 +55,7 @@ ollama pull qwen2.5vl:7b
 
 ### 2. 依存のインストール
 
-リポジトリ根:
+リポジトリ根（ルートの並列起動用）:
 
 ```bash
 cd /path/to/vlm-room-refiner
@@ -53,9 +81,9 @@ Ollama を起動した状態で、**リポジトリ根**から:
 npm run dev
 ```
 
-- **API**: 既定 `http://127.0.0.1:8010`（`8000` は他プロセスと被りやすいため。`API_PORT` で変更可）
+- **API**: 既定 `http://127.0.0.1:8010`（`8000` は他プロセスと被りやすいので避ける。`API_PORT` で変更可）
 - **Web**: `http://localhost:3000`
-- フロントの API 向き先: 未設定なら `http://127.0.0.1:8010`。変えたい場合は `frontend/.env.local` を `frontend/.env.local.example` からコピーして編集
+- **フロントのAPI向き先**: 未設定なら `http://127.0.0.1:8010`。変えたい場合は `frontend/.env.local` を `frontend/.env.local.example` からコピーして編集
 
 ### 4. 動作確認
 
@@ -63,6 +91,15 @@ npm run dev
 curl -sS http://127.0.0.1:8010/health
 # {"status":"ok"}
 ```
+
+---
+
+## よくある詰まり（先に書く）
+
+- **503（Ollama に接続できません）**: `ollama serve` が起動していない / `OLLAMA_HOST` が違う
+- **502（Ollama 側の 5xx）**: 画像が極小すぎる等でモデル側の前処理が落ちる場合あり
+- **400（画像が小さすぎ）**: PNG/JPEG/WebP で寸法が取れた場合、短辺 32px 未満を弾く（Qwen2.5-VL の制約回避）
+- **413（ファイルが大きすぎ）**: 既定 8MB。`MAX_IMAGE_BYTES` で調整
 
 ## 環境変数（主に API / 推論）
 
@@ -81,8 +118,8 @@ curl -sS http://127.0.0.1:8010/health
 | `GET` | `/health` | 生存確認 |
 | `POST` | `/analyze` | `multipart/form-data` の `file`（画像）＋任意 `style` / `budget` / `before_after` |
 
-- 極小画像（短辺 32px 未満で、PNG/JPEG/WebP として寸法を取れた場合）は **400**。寸法が取れない形式は Ollama 側の制約に委ねる。
-- Ollama 未起動などは **503**、Ollama が 5xx を返す場合は **502** など。
+- **注意**: 極小画像（短辺 32px 未満で、PNG/JPEG/WebP として寸法を取れた場合）は **400**。寸法が取れない形式は Ollama 側の制約に委ねる。
+- **注意**: Ollama 未起動などは **503**、Ollama が 5xx を返す場合は **502** など。
 
 ## CLI
 
@@ -143,6 +180,7 @@ vlm-room-refiner/
 
 - 実部屋写真でのプロンプト微調整と `docs/experiments.md` への追記
 - 本番想定: レート制限、認証、長辺リサイズ（アップロード前の軽量処理）
+- 「推しスタイル」プリセット（ミニマル / 韓国風 / モテ部屋）と予算帯での提案調整
 
 ## ライセンス
 
