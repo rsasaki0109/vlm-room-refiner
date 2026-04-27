@@ -47,7 +47,8 @@ def _load_personas(path: Path) -> list[Persona]:
 
 
 def _iter_images(dir_path: Path) -> list[Path]:
-    exts = {".jpg", ".jpeg", ".png", ".webp", ".svg"}
+    # 実運用では SVG はモデルが失敗しやすいので除外（必要なら自前でPNG化して投入）
+    exts = {".jpg", ".jpeg", ".png", ".webp"}
     imgs = [p for p in sorted(dir_path.iterdir()) if p.suffix.lower() in exts and p.is_file()]
     if not imgs:
         raise ValueError(f"no images under {dir_path}")
@@ -133,6 +134,8 @@ def main() -> None:
     p.add_argument("--personas", default="dogfooding/personas.json", help="ペルソナJSONへの相対パス（repo root 起点）")
     p.add_argument("--images", default="dogfood-input", help="画像ディレクトリ（repo root 起点。コミットしない）")
     p.add_argument("--out", default="notes/dogfooding", help="出力先ディレクトリ（repo root 起点）")
+    p.add_argument("--only-persona", default=None, help="この persona key だけ実行（任意）")
+    p.add_argument("--only-image", default=None, help="この画像ファイル名だけ実行（任意）")
     args = p.parse_args()
 
     repo = Path(__file__).resolve().parents[1]
@@ -143,6 +146,14 @@ def main() -> None:
 
     personas = _load_personas(personas_path)
     images = _iter_images(images_dir)
+    if args.only_persona:
+        personas = [p for p in personas if p.key == args.only_persona]
+        if not personas:
+            raise ValueError(f"persona not found: {args.only_persona}")
+    if args.only_image:
+        images = [p for p in images if p.name == args.only_image]
+        if not images:
+            raise ValueError(f"image not found: {args.only_image}")
 
     model_name = os.environ.get("OLLAMA_MODEL") or "qwen3-vl:8b (default/fallback)"
 

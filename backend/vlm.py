@@ -16,6 +16,10 @@ from schema import RoomAnalysis, room_analysis_json_schema
 _DEFAULT_BASE = "http://127.0.0.1:11434"
 _OLLAMA_CHAT = f"{os.environ.get('OLLAMA_HOST', _DEFAULT_BASE).rstrip('/')}/api/chat"
 
+def _timeout_seconds() -> float:
+    # dogfooding では重いモデルで遅くなりがちなので、デフォルトを長めに
+    return float(os.environ.get("OLLAMA_TIMEOUT_SECONDS", "600"))
+
 
 def _read_image_b64(path: str) -> str:
     with open(path, "rb") as f:
@@ -92,15 +96,16 @@ def analyze_room(
     b64 = _read_image_b64(image_path)
 
     try:
-        fmt: dict | str = room_analysis_json_schema()
+        schema_fmt: dict | str = room_analysis_json_schema()
     except Exception:
-        fmt = "json"
+        schema_fmt = "json"
+    fmt: dict | str = schema_fmt
 
     payload: dict = {
         "model": model,
         "stream": False,
         "format": fmt,
-        "options": {"temperature": 0.2},
+        "options": {"temperature": 0.0},
         "messages": [
             {"role": "system", "content": ANALYZE_SYSTEM},
             {
@@ -110,27 +115,62 @@ def analyze_room(
             },
         ],
     }
+    # thinking 設定はモデル/バージョンで挙動が変わるため、環境変数で明示したときのみ送る
+    think_env = os.environ.get("OLLAMA_THINK")
+    if think_env is not None:
+        payload["think"] = think_env
 
-    with httpx.Client(timeout=300.0) as client:
-        r = client.post(_OLLAMA_CHAT, json=payload)
-        # model 未導入などで 404 の場合は、より軽い/旧世代へフォールバック
-        if r.status_code == 404 and os.environ.get("OLLAMA_MODEL") is None:
-            payload["model"] = "qwen2.5vl:7b"
-            r = client.post(_OLLAMA_CHAT, json=payload)
-        if r.status_code == 400 and fmt != "json" and "format" in (payload or {}):
-            # 古い Ollama 等で JSON Schema の structured output が使えない場合
-            payload["format"] = "json"
-            r = client.post(_OLLAMA_CHAT, json=payload)
-        r.raise_for_status()
-        data = r.json()
+    def _post_chat(p: dict) -> dict:
+        with httpx.Client(timeout=_timeout_seconds()) as client:
+            rr = client.post(_OLLAMA_CHAT, json=p)
+            # model 未導入などで 404 の場合は、より軽い/旧世代へフォールバック
+            if rr.status_code == 404 and os.environ.get("OLLAMA_MODEL") is None:
+                p = {**p, "model": "qwen2.5vl:7b"}
+                rr = client.post(_OLLAMA_CHAT, json=p)
+            if rr.status_code == 400 and p.get("format") != "json":
+                # 古い Ollama 等で JSON Schema の structured output が使えない場合
+                p = {**p, "format": "json"}
+                rr = client.post(_OLLAMA_CHAT, json=p)
+            rr.raise_for_status()
+            return rr.json()
 
-    text = (data.get("message") or {}).get("content") or ""
+    used_model = payload.get("model")
+    data = _post_chat(payload)
+
+    msg = data.get("message") or {}
+    # 一部モデルは structured output を thinking 側に入れることがあるためフォールバック
+    text = (msg.get("content") or msg.get("thinking") or msg.get("response") or "").strip()
     err_note: str | None = None
+    raw_excerpt: str | None = None
     try:
-        parsed: Any = _parse_model_json(text) if text.strip() else {}
+        if not text:
+            err_note = "empty_response"
+            parsed = {}
+        else:
+            parsed = _parse_model_json(text)
     except (json.JSONDecodeError, TypeError) as e:
         err_note = f"json_parse: {e}"
+        raw_excerpt = text[:800] if text else None
         parsed = {}
+
+    # qwen3-vl が JSON を守らない場合は、互換モデルへ 1 回だけフォールバック
+    if err_note and str(model).startswith("qwen3-vl"):
+        fb_model = os.environ.get("OLLAMA_FALLBACK_MODEL", "qwen2.5vl:7b")
+        fb_payload = {**payload, "model": fb_model, "format": schema_fmt}
+        used_model = fb_model
+        data = _post_chat(fb_payload)
+        msg = data.get("message") or {}
+        text = (msg.get("content") or msg.get("thinking") or msg.get("response") or "").strip()
+        err_note = None
+        raw_excerpt = None
+        try:
+            parsed = _parse_model_json(text) if text else {}
+            if not text:
+                err_note = "empty_response_fallback"
+        except (json.JSONDecodeError, TypeError) as e:
+            err_note = f"json_parse_fallback: {e}"
+            raw_excerpt = text[:800] if text else None
+            parsed = {}
 
     if not isinstance(parsed, dict):
         err_note = err_note or "response_not_object"
@@ -145,6 +185,9 @@ def analyze_room(
         return d
 
     out = result.model_dump()
+    out["_model_used"] = used_model
     if err_note:
         out["_raw_parse_warning"] = err_note
+        if raw_excerpt:
+            out["_raw_text_excerpt"] = raw_excerpt
     return out
