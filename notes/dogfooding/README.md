@@ -11,6 +11,14 @@
 
 ## 使い方
 
+### 1コマンド（おすすめ）
+
+```bash
+cd /media/sasaki/aiueo/ai_coding_ws/vlm-room-refiner
+# 画像を dogfood-input/ に入れた後
+OLLAMA_MODEL=qwen3-vl:4b bash backend/run-dogfood.sh
+```
+
 1. ペルソナ定義（JSON）を確認/編集:
    - `/media/sasaki/aiueo/ai_coding_ws/vlm-room-refiner/dogfooding/personas.json`
 2. 入力画像を置く（コミット禁止）:
