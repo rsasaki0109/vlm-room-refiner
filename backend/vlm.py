@@ -1,4 +1,4 @@
-"""Ollama 上の Qwen2.5-VL による部屋画像分析。"""
+"""Ollama 上のローカルVLM（Qwen-VL系）による部屋画像分析。"""
 
 from __future__ import annotations
 
@@ -84,9 +84,10 @@ def analyze_room(
 
     環境変数:
     - OLLAMA_HOST: 例 http://127.0.0.1:11434
-    - OLLAMA_MODEL: 例 qwen2.5vl:7b（`ollama list` で表示される名前に合わせる）
+    - OLLAMA_MODEL: 例 qwen3-vl:8b / qwen2.5vl:7b（`ollama list` で表示される名前に合わせる）
     """
-    model = os.environ.get("OLLAMA_MODEL", "qwen2.5vl:7b")
+    # 既定は「新しめ優先」: qwen3-vl が入っていればそちら、無ければ qwen2.5vl
+    model = os.environ.get("OLLAMA_MODEL") or "qwen3-vl:8b"
     user_content = build_user_prompt(style_target, budget, want_before_after)
     b64 = _read_image_b64(image_path)
 
@@ -112,6 +113,10 @@ def analyze_room(
 
     with httpx.Client(timeout=300.0) as client:
         r = client.post(_OLLAMA_CHAT, json=payload)
+        # model 未導入などで 404 の場合は、より軽い/旧世代へフォールバック
+        if r.status_code == 404 and os.environ.get("OLLAMA_MODEL") is None:
+            payload["model"] = "qwen2.5vl:7b"
+            r = client.post(_OLLAMA_CHAT, json=payload)
         if r.status_code == 400 and fmt != "json" and "format" in (payload or {}):
             # 古い Ollama 等で JSON Schema の structured output が使えない場合
             payload["format"] = "json"

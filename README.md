@@ -6,7 +6,7 @@
 
 部屋の写真を入れるだけで、**「何が惜しいか」→「どう直すか」→「何を買うか」**を **JSON** で返す、ローカル完結の部屋改善アプリ（MVP）。
 
-- **ローカルVLM**: Ollama + Qwen2.5-VL（画像は基本ローカルで処理）
+- **ローカルVLM**: Ollama + Qwen-VL（推奨: `qwen3-vl`、互換: `qwen2.5vl`。画像は基本ローカルで処理）
 - **Web/CLI/API**: ブラウザでアップロード、CLIで一発、APIで連携
 - **実用優先**: 完璧な精度より「手が動く」提案を優先（プロンプトで育てる前提）
 
@@ -56,8 +56,9 @@ curl -sS -F "file=@/path/to/room.jpg" http://127.0.0.1:8010/analyze | jq .
 ### 1. モデル（未導入なら）
 
 ```bash
-ollama pull qwen2.5vl:7b
-# 表示名は環境に合わせ、必要なら OLLAMA_MODEL を後述の表で変更
+ollama pull qwen3-vl:8b
+# 軽め: qwen3-vl:2b / qwen3-vl:4b
+# 互換: qwen2.5vl:7b
 ```
 
 ### 2. 依存のインストール

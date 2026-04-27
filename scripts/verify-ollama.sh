@@ -16,6 +16,14 @@ fi
 echo "OK. 候補モデル（qwen|vl|vision を含む行）:"
 if command -v jq &>/dev/null; then
   jq -r '.models[].name' /tmp/ollama-tags.json 2>/dev/null | grep -Ei 'qwen|vl|vision' || true
+  echo
+  echo "推奨（例）:"
+  echo "  - 新しめ: qwen3-vl:8b（軽めは :2b/:4b）"
+  echo "  - 互換:   qwen2.5vl:7b"
+  echo
+  echo "インストール例:"
+  echo "  ollama pull qwen3-vl:8b"
+  echo "  OLLAMA_MODEL=qwen3-vl:8b uvicorn main:app --port 8010"
   echo "--- 全名 ---"
   jq -r '.models[].name' /tmp/ollama-tags.json
 else
