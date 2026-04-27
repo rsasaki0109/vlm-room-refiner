@@ -1,5 +1,7 @@
 # vlm-room-refiner
 
+[![CI](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml/badge.svg)](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml)
+
 部屋の写真を **Ollama 上の Qwen2.5-VL**（ローカル VLM）に渡し、**部屋タイプ・スタイル・課題・改善案・購入用キーワード**を JSON で返す Web＋API です。完璧な精度は狙わず、プロンプト改善で育てる前提の MVP です。
 
 | 層 | 技術 |
