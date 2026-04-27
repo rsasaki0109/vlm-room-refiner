@@ -89,6 +89,60 @@
 - 他形式（GIF 等）や寸法取れない場合は Ollama に任せ、失敗しうる。フロントは 8MB 超の事前弾きと、400/413/502/503 の**見出し＋本文＋ HTTP** 表示（`frontend/app/page.tsx`）。
 - 回帰テスト: `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` を付与（本環境は ROS 由来の `pytest` エントリポイント衝突回避）。`backend/run-tests.sh` または同様の環境付き `python -m pytest tests`。
 
+## 2026-04-27 Dogfooding（qwen3-vl）
+
+### 結論
+
+- **qwen3-vl:4b** を導入し、`POST /analyze` を実行して **HTTP 200** で JSON を取得できた。
+- `style=韓国風` / `budget=1万円前後` / `before_after=true` を与えると、recommendations に **Before/After 文**が混ざる形で返ってきた。
+
+### 確認済み事実
+
+- Ollama: `http://127.0.0.1:11434`
+- Model: `qwen3-vl:4b`（`ollama pull qwen3-vl:4b`）
+- API: `uvicorn main:app --port 8010`
+- テスト入力: 640×480 の合成 PNG（短辺 32px 以上）
+
+成功レスポンス（抜粋）:
+
+```json
+{
+  "room_type": "1Kマンションのリビング",
+  "style": "ミニマルな韓国風",
+  "problems": [
+    "配色がベージュとグレーの単色で、空間に奥行きがなく、視覚的に退屈。",
+    "収納スペースが不足し、小物が散らばっている。",
+    "采光が悪く、明るさが足りない。",
+    "ファブリックの色が暗く、清潔感が欠如。",
+    "ファブリックのサイズが大きすぎて、バランスが崩れている。"
+  ],
+  "recommendations": [
+    "Before: ... After: ...",
+    "Before: ... After: ...",
+    "Before: ... After: ...",
+    "Before: ... After: ...",
+    "Before: ... After: ..."
+  ],
+  "shopping_keywords": [
+    "木目調のミニマリストテーブル 10000円以内",
+    "韓国風の布団 10000円以内",
+    "シンプルな収納ボックス 10000円以内",
+    "明るい色のファブリック 10000円以内",
+    "シンプルなライト 10000円以内"
+  ]
+}
+```
+
+### 未確認/要確認項目
+
+- recommendation の日本語品質（誤字「退苦」など）や、実画像での安定性。
+- `qwen3-vl:8b` に上げた時の質/レイテンシ差。
+
+### 次アクション
+
+- 実部屋写真で同じパラメータ（style/budget/before_after）を試し、差分を記録する。
+- 誤字・抽象表現が出やすい場合は `prompt.py` の制約文言を強化する。
+
 | 本ファイルの絶対パス |
 |----------------------|
 | `/media/sasaki/aiueo/ai_coding_ws/vlm-room-refiner/docs/experiments.md` |
