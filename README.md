@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml/badge.svg)](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml)
 
-![vlm-room-refiner banner](docs/assets/banner.svg)
+![vlm-room-refiner UI preview](docs/assets/ui-preview.svg)
 
 部屋の写真を入れるだけで、**「何が惜しいか」→「どう直すか」→「何を買うか」**を **JSON** で返す、ローカル完結の部屋改善アプリ（MVP）。
 
