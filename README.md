@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml/badge.svg)](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml)
 
-![vlm-room-refiner UI preview](docs/assets/ui-preview.svg)
+![vlm-room-refiner screenshot](docs/assets/screenshot.png)
 
 部屋の写真を入れるだけで、**「何が惜しいか」→「どう直すか」→「何を買うか」**を **JSON** で返す、ローカル完結の部屋改善アプリ（MVP）。
 
@@ -139,6 +139,17 @@ cd backend
 ```
 
 ROS 等でグローバル `pytest` プラグインが衝突する場合は、スクリプト内の `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` を踏襲する。依存は `requirements-dev.txt`（Pillow / pytest。本番 `requirements.txt` には含めない）。
+
+## スクショ生成（Playwright）
+
+README の GUI スクショ（`docs/assets/screenshot.png`）は Playwright で自動生成できます（Ollama 不要、API はブラウザ側でモック）。
+
+```bash
+cd /path/to/vlm-room-refiner
+npm install
+cd frontend && npm install && cd ..
+npm run screenshot
+```
 
 ## CI（GitHub Actions）
 
