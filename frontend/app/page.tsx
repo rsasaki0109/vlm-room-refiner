@@ -433,6 +433,100 @@ export default function Home() {
 
       <div className="bg-zinc-100 text-zinc-900">
         <div className="mx-auto max-w-5xl px-6 py-10 md:py-14 space-y-10">
+          <section className="space-y-4">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold">家具のある“それっぽい部屋”例</h2>
+                <p className="mt-1 text-sm text-zinc-600">
+                  LP では雰囲気が伝わるように、フリー素材の部屋写真を使っています（Unsplash）。クリックでサンプルJSONも見られます。
+                </p>
+              </div>
+              <a
+                className="hidden sm:inline text-xs text-zinc-500 hover:text-zinc-700 underline underline-offset-4"
+                href="#demo"
+              >
+                デモへ
+              </a>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              {(
+                [
+                  {
+                    preset: "minimal" as const,
+                    title: "ミニマル（無印系）",
+                    img: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80",
+                    credit: {
+                      href: "https://unsplash.com/photos/8z91Qk7XGQw",
+                      text: "Unsplash",
+                    },
+                    json: presetDemo.minimal,
+                  },
+                  {
+                    preset: "korean" as const,
+                    title: "韓国風（淡色×曲線）",
+                    img: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+                    credit: {
+                      href: "https://unsplash.com/photos/iAftdIcgpFc",
+                      text: "Unsplash",
+                    },
+                    json: presetDemo.korean,
+                  },
+                  {
+                    preset: "mote" as const,
+                    title: "モテ部屋（ホテルライク）",
+                    img: "https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=1200&q=80",
+                    credit: {
+                      href: "https://unsplash.com/photos/1_RZL8BGBM8",
+                      text: "Unsplash",
+                    },
+                    json: presetDemo.mote,
+                  },
+                ] as const
+              ).map((c) => (
+                <div
+                  key={c.preset}
+                  className="rounded-2xl border border-zinc-200 bg-white overflow-hidden"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={c.img}
+                    alt={c.title}
+                    className="h-44 w-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="p-4 space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold">{c.title}</p>
+                      <span className="text-[11px] rounded-full bg-zinc-100 px-2 py-0.5 text-zinc-600">
+                        {presetLabel[c.preset]}
+                      </span>
+                    </div>
+                    <details className="group">
+                      <summary className="cursor-pointer text-xs text-zinc-600 hover:text-zinc-800">
+                        サンプルJSONを表示
+                      </summary>
+                      <pre className="mt-2 text-[11px] bg-zinc-900 text-zinc-100 rounded-xl p-3 overflow-x-auto whitespace-pre-wrap break-words">
+                        {prettyJson(c.json)}
+                      </pre>
+                    </details>
+                    <p className="text-[11px] text-zinc-500">
+                      Photo:{" "}
+                      <a
+                        className="underline underline-offset-4 hover:text-zinc-700"
+                        href={c.credit.href}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {c.credit.text}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <section className="grid gap-6 md:grid-cols-3">
             <div className="md:col-span-1">
               <h2 className="text-lg font-semibold">How it works</h2>

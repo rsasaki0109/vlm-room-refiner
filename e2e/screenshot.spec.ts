@@ -54,7 +54,7 @@ test("capture real UI screenshot (mocked API)", async ({ page }) => {
   await page.getByRole("button", { name: "分析する" }).click();
 
   // Wait until JSON shows up.
-  await page.getByText('"room_type":').waitFor();
+  await page.locator("#demo").getByText('"room_type":').first().waitFor();
 
   await page.screenshot({
     path: path.join(process.cwd(), "docs", "assets", "screenshot.png"),
