@@ -25,6 +25,16 @@ python dogfood.py --images dogfood-input --personas dogfooding/personas.json --o
 
 出力: `notes/dogfooding/*.md`（1画像×1ペルソナ=1ファイル）。
 
+4. まとめ（index）生成:
+
+```bash
+cd /media/sasaki/aiueo/ai_coding_ws/vlm-room-refiner/backend
+source .venv/bin/activate
+python dogfood_index.py --dir notes/dogfooding
+```
+
+出力: `notes/dogfooding/index.md`
+
 ## 推奨ワークフロー
 
 - まず `dogfood-input/` に **PNG/JPEG/WebP** を置く（SVG はモデルが失敗しやすいので避ける）
