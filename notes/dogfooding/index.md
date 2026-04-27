@@ -1,6 +1,6 @@
 # dogfooding index
 
-- generated: `2026-04-28T04:39:05+09:00`
+- generated: `2026-04-28T06:11:58+09:00`
 - reports: `25` (ok=25, error=0)
 
 ## 一覧
@@ -25,7 +25,7 @@
 | `synth_desk_wires_png__family_safe.md` | `family_safe` | `synth_desk_wires.png` | `qwen3-vl:4b` | `2026-04-28T04:31:09+09:00` | **ok** | `reform` | (要約を一行で追記してください。例: “韓国風を指定すると照明/色温度が提案に入った”) |
 | `synth_desk_wires_png__korean_photo.md` | `korean_photo` | `synth_desk_wires.png` | `qwen3-vl:4b` | `2026-04-28T04:29:38+09:00` | **ok** | `reform` | (要約を一行で追記してください。例: “韓国風を指定すると照明/色温度が提案に入った”) |
 | `synth_desk_wires_png__mote_hotel.md` | `mote_hotel` | `synth_desk_wires.png` | `qwen3-vl:4b` | `2026-04-28T04:30:25+09:00` | **ok** | `—` | (要約を一行で追記してください。例: “韓国風を指定すると照明/色温度が提案に入った”) |
-| `synth_desk_wires_png__student_minimal.md` | `student_minimal` | `synth_desk_wires.png` | `qwen3-vl:4b` | `2026-04-28T04:28:57+09:00` | **ok** | `forbidden` | (要約を一行で追記してください。例: “韓国風を指定すると照明/色温度が提案に入った”) |
+| `synth_desk_wires_png__student_minimal.md` | `student_minimal` | `synth_desk_wires.png` | `qwen3-vl:4b` | `2026-04-28T06:09:38+09:00` | **ok** | `—` | (要約を一行で追記してください。例: “韓国風を指定すると照明/色温度が提案に入った”) |
 | `synth_desk_wires_png__wfh_productive.md` | `wfh_productive` | `synth_desk_wires.png` | `qwen3-vl:4b` | `2026-04-28T04:32:27+09:00` | **ok** | `—` | (要約を一行で追記してください。例: “韓国風を指定すると照明/色温度が提案に入った”) |
 | `synth_living_cables_png__family_safe.md` | `family_safe` | `synth_living_cables.png` | `qwen3-vl:4b` | `2026-04-28T04:35:10+09:00` | **ok** | `work` | (要約を一行で追記してください。例: “韓国風を指定すると照明/色温度が提案に入った”) |
 | `synth_living_cables_png__korean_photo.md` | `korean_photo` | `synth_living_cables.png` | `qwen3-vl:4b` | `2026-04-28T04:34:10+09:00` | **ok** | `reform` | (要約を一行で追記してください。例: “韓国風を指定すると照明/色温度が提案に入った”) |
