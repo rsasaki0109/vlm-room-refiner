@@ -34,6 +34,11 @@ curl -sS -F "file=@/path/to/room.jpg" http://127.0.0.1:8010/analyze | jq .
 
 （`jq` が無ければ `| jq .` を外してください）
 
+## Live Demo（GitHub Pages）
+
+- `https://rsasaki0109.github.io/vlm-room-refiner/`  
+  ※ Pages 上ではバックエンドは動かさず、**モック応答**で UI の流れが分かるデモになっています。
+
 | 層 | 技術 |
 |----|------|
 | API | Python 3.12+ / FastAPI / httpx / Pydantic v2 |
