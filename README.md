@@ -171,7 +171,7 @@ vlm-room-refiner/
   package.json              # npm run dev / screenshot / dogfood
   backend/                  # FastAPI, Ollama, CLI, tests
   frontend/                 # Next.js 15（App Router）
-  docs/                     # architecture, prompts, experiments
+  docs/                     # PLAN.md（統合計画）, architecture, prompts, experiments
   scripts/                  # run-api.sh, verify-ollama.sh, gen_dogfood_synthetic_images.py
   notes/dogfooding/         # バッチ結果メモ（実写真パスはコミットしない運用）
 ```
@@ -180,9 +180,10 @@ vlm-room-refiner/
 
 | ファイル | 内容 |
 | --- | --- |
+| **[docs/PLAN.md](docs/PLAN.md)** | **開発計画・ロードマップ（統合・正本）** |
 | [docs/architecture.md](docs/architecture.md) | 構成 |
 | [docs/prompts.md](docs/prompts.md) | プロンプトの考え方 |
-| [docs/experiments.md](docs/experiments.md) | 実験メモ |
+| [docs/experiments.md](docs/experiments.md) | 実験メモ（日付ログ） |
 
 ## GitHub で見つけやすくする（おすすめトピック）
 
@@ -190,11 +191,9 @@ vlm-room-refiner/
 
 `ollama` · `qwen-vl` · `vision-language-model` · `local-ai` · `privacy` · `fastapi` · `nextjs` · `interior` · `room-design` · `structured-output`
 
-## ロードマップ（案）
+## ロードマップ
 
-- 実写でのプロンプト継続調整と `docs/experiments.md` への記録
-- アップロード前の長辺リサイズ・レート制限など本番向けハードニング
-- スタイルプリセットと予算帯のより明示的な反映
+優先度・フェーズ分け・検証ループの詳細は **[docs/PLAN.md](docs/PLAN.md)** を参照（README では箇条書きを重複させない）。
 
 ## コントリビューション
 
