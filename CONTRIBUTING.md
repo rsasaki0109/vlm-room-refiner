@@ -23,6 +23,7 @@ Issues と Pull Request を歓迎します。
 
 ## プロンプト・VLM まわり
 
+- 全体の優先度・ロードマップは `docs/PLAN.md`。
 - 文言の調整は `backend/prompt.py`。
 - 実写や合成画像での試行は `notes/dogfooding/` の手順（`backend/run-dogfood.sh`）を参照。個人の部屋写真は **コミットしない** でください（`.gitignore` の `dogfood-input/`）。
 
