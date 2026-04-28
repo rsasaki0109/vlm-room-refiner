@@ -1,7 +1,7 @@
 {
   "name": "vlm-room-refiner",
   "private": true,
-  "description": "API(8010) + Next(3000) 同時起動。Ollama は別途。",
+  "description": "Local VLM (Ollama + Qwen-VL) room photo analyzer: structured JSON + Next.js UI + FastAPI.",
   "scripts": {
     "dev": "concurrently -n api,web -c blue,magenta \"npm run dev:api\" \"npm run dev:web\"",
     "dev:api": "bash scripts/run-api.sh",

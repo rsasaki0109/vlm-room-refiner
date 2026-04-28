@@ -1,18 +1,35 @@
 # vlm-room-refiner
 
+**部屋の写真 → 課題・改善案・買い物キーワードを JSON で返す**、**100% ローカル**のインテリア支援ツールです。  
+画像は基本あなたのマシンと [Ollama](https://ollama.com/) 上の VLM だけを通ります（クラウドの画像解析 API に送らない）。
+
 [![CI](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml/badge.svg)](https://github.com/rsasaki0109/vlm-room-refiner/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/rsasaki0109/vlm-room-refiner?style=social)](https://github.com/rsasaki0109/vlm-room-refiner/stargazers)
 
-![vlm-room-refiner screenshot](docs/assets/screenshot.png)
+![Web UI screenshot](docs/assets/screenshot.png)
 
-部屋の写真を入れるだけで、**「何が惜しいか」→「どう直すか」→「何を買うか」**を **JSON** で返す、ローカル完結の部屋改善アプリ（MVP）。
-
-- **ローカルVLM**: Ollama + Qwen-VL（推奨: `qwen3-vl`、互換: `qwen2.5vl`。画像は基本ローカルで処理）
-- **Web/CLI/API**: ブラウザでアップロード、CLIで一発、APIで連携
-- **実用優先**: 完璧な精度より「手が動く」提案を優先（プロンプトで育てる前提）
+| [Live Demo (GitHub Pages)](https://rsasaki0109.github.io/vlm-room-refiner/) | UI とモック JSON（バックエンドなし） |
+| --- | --- |
 
 ---
 
-## 返すJSON（MVP）
+## こんな人向け
+
+- **プライバシー重視**: 部屋写真を外部 API に送りたくない
+- **ローカル AI**: Ollama + Qwen-VL でオフラインに近い運用がしたい
+- **アプリ連携したい**: FastAPI で `/analyze` に投げれば JSON が返るので、拡張しやすい
+
+## 特徴
+
+| | |
+| --- | --- |
+| **構造化出力** | `room_type` / `style` / `problems` / `recommendations` / `shopping_keywords` を [Pydantic](backend/schema.py) でスキーマ固定 |
+| **賃貸寄りの前提** | プロンプト側で「工事・開口増設・塗り壁し直し」などを抑え、置き型・配線モール・照明などに寄せる（完全ではないので [dogfooding](notes/dogfooding/README.md) で育てる想定） |
+| **Web + API + CLI** | Next.js の LP／デモ、FastAPI、`backend/cli.py` |
+| **CI** | フロント `build` とバックエンド `pytest`（[workflow](.github/workflows/ci.yml)） |
+
+## 返す JSON（例）
 
 ```json
 {
@@ -24,110 +41,89 @@
 }
 ```
 
-## デモ（curl）
+## 必要な環境
 
-API を起動したあと（後述）、部屋画像を投げるだけ:
-
-```bash
-curl -sS -F "file=@/path/to/room.jpg" http://127.0.0.1:8010/analyze | jq .
-```
-
-（`jq` が無ければ `| jq .` を外してください）
-
-## Live Demo（GitHub Pages）
-
-- `https://rsasaki0109.github.io/vlm-room-refiner/`  
-  ※ Pages 上ではバックエンドは動かさず、**モック応答**で UI の流れが分かるデモになっています。
-
-| 層 | 技術 |
-|----|------|
-| API | Python 3.12+ / FastAPI / httpx / Pydantic v2 |
-| UI | Next.js 15 / React 19 / Tailwind |
-| 推論 | Ollama `POST /api/chat`、既定モデル名は環境で指定 |
-
-## 必要なもの
-
-- [Ollama](https://ollama.com/) が起動し、推論用に **Qwen2.5-VL 系**（例: `qwen2.5vl:7b`）が `ollama list` に出ていること
-- **Node.js**（例: 20+）と **npm**
-- **Python 3.12+**（API 用。`backend` に venv を作る想定）
+- [Ollama](https://ollama.com/)（推論）— 例: **Qwen3-VL**（`qwen3-vl:8b`）または **Qwen2.5-VL**（`qwen2.5vl:7b`）
+- **Node.js** 20+ と **npm**
+- **Python 3.12+**
 
 ## クイックスタート
 
-### 1. モデル（未導入なら）
+### 1. モデルを取得（未導入なら）
 
 ```bash
 ollama pull qwen3-vl:8b
-# 軽め: qwen3-vl:2b / qwen3-vl:4b
-# 互換: qwen2.5vl:7b
+# メモリが厳しければ: qwen3-vl:4b など
+# 互換: ollama pull qwen2.5vl:7b
 ```
 
-### 2. 依存のインストール
-
-リポジトリ根（ルートの並列起動用）:
+### 2. 依存インストール
 
 ```bash
-cd /path/to/vlm-room-refiner
+git clone https://github.com/rsasaki0109/vlm-room-refiner.git
+cd vlm-room-refiner
 npm install
 cd frontend && npm install && cd ..
 ```
 
-API 用 venv（初回）:
-
 ```bash
 cd backend
 python3 -m venv .venv
-source .venv/bin/activate   # Windows は .venv\Scripts\activate
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cd ..
 ```
 
-### 3. 一括で開発起動
+### 3. 起動（Ollama を動かした状態で）
 
-Ollama を起動した状態で、**リポジトリ根**から:
+リポジトリ**ルート**から:
 
 ```bash
 npm run dev
 ```
 
-- **API**: 既定 `http://127.0.0.1:8010`（`8000` は他プロセスと被りやすいので避ける。`API_PORT` で変更可）
+- **API**: `http://127.0.0.1:8010`（`API_PORT` で変更可）
 - **Web**: `http://localhost:3000`
-- **フロントのAPI向き先**: 未設定なら `http://127.0.0.1:8010`。変えたい場合は `frontend/.env.local` を `frontend/.env.local.example` からコピーして編集
+- API の向き先を変える場合は `frontend/.env.local`（`frontend/.env.local.example` をコピー）
 
 ### 4. 動作確認
 
 ```bash
 curl -sS http://127.0.0.1:8010/health
 # {"status":"ok"}
+
+curl -sS -F "file=@/path/to/room.jpg" http://127.0.0.1:8010/analyze | jq .
 ```
 
----
+（`jq` が無ければ末尾の `| jq .` を外してください）
 
-## よくある詰まり（先に書く）
+## よくあるつまずき
 
-- **503（Ollama に接続できません）**: `ollama serve` が起動していない / `OLLAMA_HOST` が違う
-- **502（Ollama 側の 5xx）**: 画像が極小すぎる等でモデル側の前処理が落ちる場合あり
-- **400（画像が小さすぎ）**: PNG/JPEG/WebP で寸法が取れた場合、短辺 32px 未満を弾く（Qwen2.5-VL の制約回避）
-- **413（ファイルが大きすぎ）**: 既定 8MB。`MAX_IMAGE_BYTES` で調整
+| 症状 | 対処 |
+| --- | --- |
+| **503** | `ollama serve` が動いているか、`OLLAMA_HOST` が正しいか |
+| **502** | 画像が極端に小さい等でモデル側が失敗することがある |
+| **400** | 短辺 32px 未満の画像は弾く（VLM 制約回避） |
+| **413** | 既定 8MB 超。`MAX_IMAGE_BYTES` で調整 |
 
-## 環境変数（主に API / 推論）
+## 環境変数（API / 推論）
 
 | 変数 | 既定 | 意味 |
-|------|------|------|
+| --- | --- | --- |
 | `OLLAMA_HOST` | `http://127.0.0.1:11434` | Ollama のベース URL |
-| `OLLAMA_MODEL` | `qwen2.5vl:7b` | 利用するタグ名（`ollama list` と揃える） |
-| `MAX_IMAGE_BYTES` | `8388608`（8MB） | 1 リクエストの画像バイト数上限（超過は 413） |
+| `OLLAMA_MODEL` | `qwen3-vl:8b` | `ollama list` のタグ名に合わせる |
+| `OLLAMA_FALLBACK_MODEL` | `qwen2.5vl:7b` | Qwen3-VL が JSON を破ったときの 1 回だけのフォールバック |
+| `OLLAMA_TIMEOUT_SECONDS` | `600` | 推論タイムアウト（秒） |
+| `MAX_IMAGE_BYTES` | `8388608`（8MB） | 超過は HTTP 413 |
 | `CORS_ORIGINS` | ローカル 3000 系 | カンマ区切りで追記可 |
-| `API_PORT` | `8010` | ルート `npm run dev` の API 用（`scripts/run-api.sh`） |
+| `API_PORT` | `8010` | `scripts/run-api.sh` / ルート `npm run dev` |
 
 ## API
 
 | メソッド | パス | 説明 |
-|----------|------|------|
+| --- | --- | --- |
 | `GET` | `/health` | 生存確認 |
 | `POST` | `/analyze` | `multipart/form-data` の `file`（画像）＋任意 `style` / `budget` / `before_after` |
-
-- **注意**: 極小画像（短辺 32px 未満で、PNG/JPEG/WebP として寸法を取れた場合）は **400**。寸法が取れない形式は Ollama 側の制約に委ねる。
-- **注意**: Ollama 未起動などは **503**、Ollama が 5xx を返す場合は **502** など。
 
 ## CLI
 
@@ -144,64 +140,66 @@ cd backend
 ./run-tests.sh
 ```
 
-ROS 等でグローバル `pytest` プラグインが衝突する場合は、スクリプト内の `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` を踏襲する。依存は `requirements-dev.txt`（Pillow / pytest。本番 `requirements.txt` には含めない）。
+ROS 等でグローバル `pytest` プラグインが衝突する場合は `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` を使う（スクリプト内で設定済み）。
 
-## スクショ生成（Playwright）
-
-README の GUI スクショ（`docs/assets/screenshot.png`）は Playwright で自動生成できます（Ollama 不要、API はブラウザ側でモック）。
+## スクショ更新（Playwright）
 
 ```bash
-cd /path/to/vlm-room-refiner
 npm install
 cd frontend && npm install && cd ..
 npm run screenshot
 ```
 
+`docs/assets/screenshot.png` が更新されます（API・Ollama 不要）。
+
+## Dogfooding（プロンプト検証）
+
+ペルソナ × 複数画像でバッチ実行する場合は [notes/dogfooding/README.md](notes/dogfooding/README.md) を参照。
+
+```bash
+npm run dogfood
+```
+
 ## CI（GitHub Actions）
 
-`main` / `master` へのプッシュと PR で、次のジョブが **Ubuntu** 上で走ります（Ollama は不要）。
-
-| ジョブ | 内容 |
-|--------|------|
-| `frontend` | `frontend` で `npm ci` → `npm run build` |
-| `backend` | `backend` で `pip install -r requirements-dev.txt` → `pytest tests/`（`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`） |
-
-定義ファイル: `.github/workflows/ci.yml`。リモートにプッシュすると Actions タブから結果を確認できる。
+`main` / `master` のプッシュと PR でフロント `build` とバックエンド `pytest` が Ubuntu 上で実行されます（Ollama は不要）。
 
 ## リポジトリ構成
 
 ```text
 vlm-room-refiner/
-  README.md                 # 本ファイル
-  package.json              # ルート: npm run dev など
-  .github/workflows/ci.yml  # GitHub Actions
-  scripts/                  # run-api.sh, verify-ollama.sh
-  backend/
-    main.py                 # FastAPI
-    vlm.py                  # Ollama 呼び出し
-    prompt.py, schema.py, image_size.py, cli.py
-    requirements.txt
-    requirements-dev.txt
-    run-tests.sh, pytest.ini, tests/
-  frontend/                 # Next.js（app ルーター）
-  docs/
-    architecture.md
-    prompts.md
-    experiments.md
+  package.json              # npm run dev / screenshot / dogfood
+  backend/                  # FastAPI, Ollama, CLI, tests
+  frontend/                 # Next.js 15（App Router）
+  docs/                     # architecture, prompts, experiments
+  scripts/                  # run-api.sh, verify-ollama.sh, gen_dogfood_synthetic_images.py
+  notes/dogfooding/         # バッチ結果メモ（実写真パスはコミットしない運用）
 ```
 
 ## ドキュメント
 
-設計・プロンプト原文・実験メモは `docs/` を参照。絶対パスで相互参照する場合の例:  
-`/path/to/vlm-room-refiner/docs/architecture.md`
+| ファイル | 内容 |
+| --- | --- |
+| [docs/architecture.md](docs/architecture.md) | 構成 |
+| [docs/prompts.md](docs/prompts.md) | プロンプトの考え方 |
+| [docs/experiments.md](docs/experiments.md) | 実験メモ |
 
-## 今後の候補
+## GitHub で見つけやすくする（おすすめトピック）
 
-- 実部屋写真でのプロンプト微調整と `docs/experiments.md` への追記
-- 本番想定: レート制限、認証、長辺リサイズ（アップロード前の軽量処理）
-- 「推しスタイル」プリセット（ミニマル / 韓国風 / モテ部屋）と予算帯での提案調整
-- Dogfooding: ペルソナ×複数画像でのバッチ実行と `notes/dogfooding/` への記録（実画像はコミットしない）
+リポジトリの **About → Topics** に例えば次を追加すると検索に掛かりやすくなります:
+
+`ollama` · `qwen-vl` · `vision-language-model` · `local-ai` · `privacy` · `fastapi` · `nextjs` · `interior` · `room-design` · `structured-output`
+
+## ロードマップ（案）
+
+- 実写でのプロンプト継続調整と `docs/experiments.md` への記録
+- アップロード前の長辺リサイズ・レート制限など本番向けハードニング
+- スタイルプリセットと予算帯のより明示的な反映
+
+## コントリビューション
+
+[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
 
 ## ライセンス
 
-未設定（必要に応じて追記してください）。
+[MIT](LICENSE)
