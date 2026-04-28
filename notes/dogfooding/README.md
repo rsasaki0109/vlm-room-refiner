@@ -8,6 +8,7 @@
 
 - 実部屋写真は個人情報・プライバシーになりうるため **コミットしない**。  
   画像は `/media/sasaki/aiueo/ai_coding_ws/vlm-room-refiner/dogfood-input/` に置き、`.gitignore` 済み。
+- バッチ実行でできる **`notes/dogfooding/` の個別レポート（`*.md`）も既定では Git に含めない**（ルート `.gitignore`）。まとめの `index.md` と本 README だけ追跡対象にできる。
 
 ## 使い方
 

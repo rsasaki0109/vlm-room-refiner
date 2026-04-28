@@ -20,6 +20,11 @@ playwright-report/
 # dogfooding inputs (do not commit personal room photos)
 dogfood-input/
 
+# dogfooding: per-run markdown reports (regenerate locally). README + index stay tracked.
+notes/dogfooding/*.md
+!notes/dogfooding/README.md
+!notes/dogfooding/index.md
+
 # env
 .env
 .env.local
